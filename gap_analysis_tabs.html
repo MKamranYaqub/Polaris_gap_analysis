@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Polaris - GAP Analysis </title>
+<style>
+  :root {
+    --bg: #0b1020;
+    --card: #121831;
+    --text: #e8ecf8;
+    --muted: #9aa4c7;
+    --green: #1ea672;
+    --red: #d94f4f;
+    --border: #1f2747;
+    --accent: #5b7cff;
+  }
+  html, body { height:100%; margin:0; background: radial-gradient(1200px 600px at 20% -10%, #1a2144 0, transparent 60%), radial-gradient(900px 500px at 120% 10%, #13234d 0, transparent 40%), var(--bg); color:var(--text); font-family: ui-sans-serif, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+  .container { max-width: 1180px; margin: 22px auto 80px; padding: 0 16px; }
+  h1 { font-size: 28px; margin: 0 0 2px 0; }
+  .meta { color: var(--muted); font-size: 13px; }
+  /* Tabs */
+  .tabs { display:flex; gap:8px; margin:16px 0 14px; flex-wrap: wrap; }
+  .tab-btn { background: #0f1630; border:1px solid var(--border); color:#cfd7ff; padding:10px 14px; border-radius: 12px; cursor:pointer; font-weight:600; font-size:14px; }
+  .tab-btn.active { background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border-color:#2a3566; }
+  .tab-pane { display:none; }
+  .tab-pane.active { display:block; }
+  /* KPI cards */
+  .cards { display:grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 0 18px; }
+  .card { background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01)); border:1px solid var(--border); border-radius:16px; padding:16px; backdrop-filter: blur(4px); box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  .kpi { font-size: 13px; color: var(--muted); }
+  .kpi strong { display:block; font-size:28px; color:var(--text); }
+  /* Legend and search */
+  .legend { display:flex; gap:8px; align-items:center; color:var(--muted); font-size:13px; margin: 6px 0 12px;}
+  .dot { width:10px; height:10px; border-radius:50%; display:inline-block; }
+  .dot.y { background:#2ac08b; } .dot.n { background:#e26b6b; }
+  .search { display:flex; gap:8px; align-items:center; margin: 8px 0 10px; }
+  .search input { background:#0f1733; border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:12px; width:320px; outline:none; }
+  /* Table */
+  .table-wrap { overflow:auto; border-radius:16px; border:1px solid var(--border); }
+  table { width:100%; border-collapse: collapse; background: var(--card); }
+  thead th { position:sticky; top:0; background:#0f1630; font-weight:600; font-size:13px; color:#c8d0ef; letter-spacing:.3px; border-bottom:1px solid var(--border); padding:12px 10px; }
+  tbody td { padding:10px 10px; font-size:14px; border-bottom:1px dashed #1c2446; }
+  tbody tr:hover td { background: rgba(255,255,255,.02); }
+  .feature { color:#eaf0ff; white-space:nowrap; }
+  .pill { display:inline-block; min-width:50px; text-align:center; border-radius:999px; padding:6px 10px; font-weight:600; font-size:12px; letter-spacing:.2px; }
+  .yes { background: rgba(30,166,114,.18); color:#bdf3df; border:1px solid rgba(30,166,114,.45);}
+  .no  { background: rgba(217,79,79,.18); color:#ffd3d3; border:1px solid rgba(217,79,79,.45);}
+  /* Chart */
+  .chart-card { margin-top: 16px; }
+  canvas { width:100%; max-width:1080px; height:320px; display:block; }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Polaris - GAP Analysis (Excel vs Portal vs Web)</h1>
+    <div class="meta">Interactive dashboard</div>
+
+    <div class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="tab0">BTL Residential</button><button class="tab-btn " data-tab="tab1">BTL Commercial</button><button class="tab-btn " data-tab="tab2">Bridge</button><button class="tab-btn " data-tab="tab3">Fusion</button>
+    </div>
+
+    
+    <div class="tab-pane active" id="tab0">
+      <div class="cards">
+        <div class="card"><div class="kpi">Excel Coverage<strong>22 / 26</strong></div></div>
+        <div class="card"><div class="kpi">Portal Coverage<strong>11 / 26</strong></div></div>
+        <div class="card"><div class="kpi">Web Coverage<strong>6 / 26</strong></div></div>
+      </div>
+
+      <div class="legend"><span><i class="dot y"></i> Yes</span> <span><i class="dot n"></i> No</span></div>
+
+      <div class="search">
+        <input id="filter-0" placeholder="Filter features (e.g., override, PDF, ICR)"/>
+      </div>
+
+      <div class="table-wrap">
+        <table id="heatmap-0">
+          <thead>
+            <tr><th>Features</th><th>Excel Calculator</th><th>Portal Calculator</th><th>Web Calculator</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card chart-card">
+        <div class="kpi">Feature Coverage by Calculator — BTL Residential</div>
+        <canvas id="barChart-0" width="1080" height="320"></canvas>
+      </div>
+    </div>
+    
+    <div class="tab-pane " id="tab1">
+      <div class="cards">
+        <div class="card"><div class="kpi">Excel Coverage<strong>22 / 26</strong></div></div>
+        <div class="card"><div class="kpi">Portal Coverage<strong>11 / 26</strong></div></div>
+        <div class="card"><div class="kpi">Web Coverage<strong>6 / 26
+
+        </strong></div></div>
+      </div>
+
+      <div class="legend"><span><i class="dot y"></i> Yes</span> <span><i class="dot n"></i> No</span></div>
+
+      <div class="search">
+        <input id="filter-1" placeholder="Filter features (e.g., override, PDF, ICR)"/>
+      </div>
+
+      <div class="table-wrap">
+        <table id="heatmap-1">
+          <thead>
+            <tr><th>Features</th><th>Excel Calculator</th><th>Portal Calculator</th><th>Web Calculator</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card chart-card">
+        <div class="kpi">Feature Coverage by Calculator — BTL Commercial</div>
+        <canvas id="barChart-1" width="1080" height="320"></canvas>
+      </div>
+    </div>
+    
+    <div class="tab-pane " id="tab2">
+      <div class="cards">
+        <div class="card"><div class="kpi">Excel Coverage<strong>20 / 27</strong></div></div>
+        <div class="card"><div class="kpi">Portal Coverage<strong>0 / 27</strong></div></div>
+        <div class="card"><div class="kpi">Web Coverage<strong>7 / 27</strong></div></div>
+      </div>
+
+      <div class="legend"><span><i class="dot y"></i> Yes</span> <span><i class="dot n"></i> No</span></div>
+
+      <div class="search">
+        <input id="filter-2" placeholder="Filter features (e.g., override, PDF, ICR)"/>
+      </div>
+
+      <div class="table-wrap">
+        <table id="heatmap-2">
+          <thead>
+            <tr><th>Features</th><th>Excel Calculator</th><th>Portal Calculator</th><th>Web Calculator</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card chart-card">
+        <div class="kpi">Feature Coverage by Calculator — Bridge</div>
+        <canvas id="barChart-2" width="1080" height="320"></canvas>
+      </div>
+    </div>
+    
+    <div class="tab-pane " id="tab3">
+      <div class="cards">
+        <div class="card"><div class="kpi">Excel Coverage<strong>18 / 27</strong></div></div>
+        <div class="card"><div class="kpi">Portal Coverage<strong>0 / 27</strong></div></div>
+        <div class="card"><div class="kpi">Web Coverage<strong>6 / 27</strong></div></div>
+      </div>
+
+      <div class="legend"><span><i class="dot y"></i> Yes</span> <span><i class="dot n"></i> No</span></div>
+
+      <div class="search">
+        <input id="filter-3" placeholder="Filter features (e.g., override, PDF, ICR)"/>
+      </div>
+
+      <div class="table-wrap">
+        <table id="heatmap-3">
+          <thead>
+            <tr><th>Features</th><th>Excel Calculator</th><th>Portal Calculator</th><th>Web Calculator</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="card chart-card">
+        <div class="kpi">Feature Coverage by Calculator — Fusion</div>
+        <canvas id="barChart-3" width="1080" height="320"></canvas>
+      </div>
+    </div>
+    
+  </div>
+
+<script>
+const SHEETS = {"BTL Residential": [["Quote Creation", "Yes", "Yes", "Yes"], ["Basic Gross Loan", "Yes", "Yes", "Yes"], ["Max Roll and Deferred", "Yes", "Yes", "Yes"], ["Specific Net Loan", "Yes", "Yes", "Yes"], ["Custom Roll and Defered", "Yes", "Yes", "No"], ["ICR Output", "Yes", "Yes", "No"], ["Product Quote PDF", "Yes", "Yes", "No"], ["NBP Calculation", "Yes", "Yes", "No"], ["Top Slicing", "Yes", "Yes", "No"], ["DIP Creation", "Yes", "No", "No"], ["Retention Products", "Yes", "No", "No"], ["Dynamic UW Requirement", "Yes", "No", "No"], ["Optimum Roll and Deferred", "Yes", "No", "No"], ["Specific Gross Loan", "Yes", "No", "No"], ["Title Insurance Calculation", "Yes", "No", "No"], ["Tier Override", "Yes", "No", "No"], ["Rate Override", "Yes", "No", "No"], ["Broker Client Fee", "Yes", "No", "No"], ["Revert Period DD", "Yes", "No", "No"], ["BBR Override", "Yes", "No", "No"], ["Stress BBR Override", "Yes", "No", "No"], ["Arrangement Fee Override", "Yes", "No", "No"], ["Specific LTV Loan", "No", "Yes", "No"], ["Quote Storage", "No", "Yes", "No"], ["Send Quote Email", "No", "No", "Yes"], ["Selecting Best Quote", "No", "No", "Yes"], ], "BTL Commercial": [["Quote Creation", "Yes", "Yes", "Yes"], ["Basic Gross Loan", "Yes", "Yes", "Yes"], ["Max Roll and Deferred", "Yes", "Yes", "Yes"], ["Specific Net Loan", "Yes", "Yes", "Yes"], ["Custom Roll and Defered", "Yes", "Yes", "No"], ["ICR Output", "Yes", "Yes", "No"], ["Product Quote PDF", "Yes", "Yes", "No"], ["NBP Calculation", "Yes", "Yes", "No"], ["Top Slicing", "Yes", "Yes", "No"], ["DIP Creation", "Yes", "No", "No"], ["Retention Products", "Yes", "No", "No"], ["Dynamic UW Requirement", "Yes", "No", "No"], ["Optimum Roll and Deferred", "Yes", "No", "No"], ["Specific Gross Loan", "Yes", "No", "No"], ["Title Insurance Calculation", "Yes", "No", "No"], ["Tier Override", "Yes", "No", "No"], ["Rate Override", "Yes", "No", "No"], ["Broker Client Fee", "Yes", "No", "No"], ["Revert Period DD", "Yes", "No", "No"], ["BBR Override", "Yes", "No", "No"], ["Stress BBR Override", "Yes", "No", "No"], ["Arrangement Fee Override", "Yes", "No", "No"], ["Specific LTV Loan", "No", "Yes", "No"], ["Quote Storage", "No", "Yes", "No"], ["Send Quote Email", "No", "No", "Yes"], ["Selecting Best Quote", "No", "No", "Yes"], ], "Bridge": [["Quote Creation", "Yes", "No", "Yes"], ["Basic Gross Loan", "Yes", "No", "Yes"], ["Specific Net Loan", "Yes", "No", "Yes"], ["Specific Gross Loan", "Yes", "No", "Yes"], ["Custom Roll", "Yes", "No", "Yes"], ["2nd Charge Loan", "Yes", "No", "Yes"], ["DIP Creation", "Yes", "No", "No"], ["Product Quote PDF", "Yes", "No", "No"], ["Title Insurance Calculation", "Yes", "No", "No"], ["Rate Override", "Yes", "No", "No"], ["Broker Client Fee", "Yes", "No", "No"], ["NBP Calculation", "Yes", "No", "No"], ["BBR Override", "Yes", "No", "No"], ["Arrangement Fee Override", "Yes", "No", "No"], ["Exit Fee Calculation", "Yes", "No", "No"], ["Multi Property Loan", "Yes", "No", "No"], ["Payment Schedules (Tracker)", "Yes", "No", "No"], ["Quote Product Selection (Specific if required)", "Yes", "No", "No"], ["Commitment Fee", "Yes", "No", "No"], ["Proc Fee Calculations", "Yes", "No", "No"], ["Send Quote Email", "No", "No", "Yes"], ["Retention Products", "No", "No", "No"], ["Dynamic UW Requirement", "No", "No", "No"], ["Specific LTV Loan", "No", "No", "No"], ["Quote Storage", "No", "No", "No"], ["Selecting Best Quote", "No", "No", "No"], ["Revert Period DD", "No", "No", "No"], ], "Fusion": [["Quote Creation", "Yes", "No", "Yes"], ["Basic Gross Loan", "Yes", "No", "Yes"], ["Specific Net Loan", "Yes", "No", "Yes"], ["Specific Gross Loan", "Yes", "No", "Yes"], ["Custom Roll and Defered", "Yes", "No", "Yes"], ["DIP Creation", "Yes", "No", "No"], ["Product Quote PDF", "Yes", "No", "No"], ["Title Insurance Calculation", "Yes", "No", "No"], ["Rate Override", "Yes", "No", "No"], ["Broker Client Fee", "Yes", "No", "No"], ["NBP Calculation", "Yes", "No", "No"], ["BBR Override", "Yes", "No", "No"], ["Multi Property Loan", "Yes", "No", "No"], ["Payment Schedules (Tracker)", "Yes", "No", "No"], ["Quote Product Selection (Specific if required)", "Yes", "No", "No"], ["Proc Fee Calculations", "Yes", "No", "No"], ["Fusion Portfolio Calculations", "Yes", "No", "No"], ["Fusion Portfolio Input", "Yes", "No", "No"], ["Send Quote Email", "No", "No", "Yes"], ["Retention Products", "No", "No", "No"], ["Dynamic UW Requirement", "No", "No", "No"], ["Specific LTV Loan", "No", "No", "No"], ["Quote Storage", "No", "No", "No"], ["Selecting Best Quote", "No", "No", "No"], ["Revert Period DD", "No", "No", "No"], ["Arrangement Fee Override", "No", "No", "No"], ["Exit Fee Calculation", "No", "No", "No"], ]};
+
+function renderTable(sheetName, idx, filterText="") {
+  const rows = SHEETS[sheetName];
+  const tb = document.querySelector(`#heatmap-${idx} tbody`);
+  tb.innerHTML = "";
+  const f = (filterText||"").trim().toLowerCase();
+  rows.forEach(r => {
+    const [feat, excel, portal, web] = r;
+    if (f && !feat.toLowerCase().includes(f)) return;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="feature">${feat}</td>
+      <td><span class="pill ${excel.toLowerCase()==='yes'?'yes':'no'}" title="Excel: ${excel}">${excel}</span></td>
+      <td><span class="pill ${portal.toLowerCase()==='yes'?'yes':'no'}" title="Portal: ${portal}">${portal}</span></td>
+      <td><span class="pill ${web.toLowerCase()==='yes'?'yes':'no'}" title="Web: ${web}">${web}</span></td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+function renderBar(sheetName, idx) {
+  const rows = SHEETS[sheetName];
+  const total = rows.length;
+  const yn = v => (v.toLowerCase()==='yes'?1:0);
+  let excel=0, portal=0, web=0;
+  rows.forEach(([feat, e,p,w])=>{ excel+=yn(e); portal+=yn(p); web+=yn(w); });
+  const canvas = document.getElementById(`barChart-${idx}`);
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.width * dpr; canvas.height = canvas.height * dpr;
+  ctx.scale(dpr, dpr);
+
+  const labels = ["Excel", "Portal", "Web"];
+  const values = [excel, portal, web];
+  const W = canvas.clientWidth; const H = canvas.clientHeight;
+  const padding = 40; const chartW = W - padding*2; const chartH = H - padding*2;
+  const barW = chartW / (values.length * 1.8); const gap = barW * 0.8;
+
+  // Grid
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1;
+  for (let i=0;i<=total;i+=5) {
+    const y = padding + chartH - (i/total)*chartH;
+    ctx.beginPath(); ctx.moveTo(padding, y); ctx.lineTo(W - padding, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(200,210,250,0.35)'; ctx.font='12px sans-serif'; ctx.fillText(i.toString(), 8, y+4);
+  }
+  // Bars
+  const colors = ['#5fd0a7','#7ea2ff','#ffb870'];
+  values.forEach((v,i)=>{
+    const x = padding + i*(barW+gap) + gap;
+    const h = (v/total) * chartH;
+    const y = padding + chartH - h;
+    const w = barW; const radius = 10;
+    ctx.fillStyle = colors[i];
+    ctx.beginPath();
+    ctx.moveTo(x, y+radius);
+    ctx.arcTo(x, y, x+radius, y, radius);
+    ctx.lineTo(x+w-radius, y);
+    ctx.arcTo(x+w, y, x+w, y+radius, radius);
+    ctx.lineTo(x+w, y+h);
+    ctx.lineTo(x, y+h);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = 'rgba(230,235,255,0.9)'; ctx.font='13px sans-serif'; ctx.textAlign='center';
+    ctx.fillText(labels[i], x + w/2, H - 10);
+    ctx.fillText(v + " / " + total, x + w/2, y - 6);
+  });
+  // Tooltip
+  canvas.onmousemove = (e)=>{
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left; const my = e.clientY - rect.top;
+    const bars = values.map((v,i)=>{
+      const x = padding + i*(barW+gap) + gap;
+      const h = (v/total) * chartH; const y = padding + chartH - h;
+      return {i,x,y,w:barW,h, v};
+    });
+    const hit = bars.find(b => mx>=b.x && mx<=b.x+b.w && my>=b.y && my<=b.y+b.h);
+    canvas.title = hit ? `${labels[hit.i]}: ${hit.v} / ${total} features` : '';
+  };
+}
+
+function init() {
+  const tabButtons = document.querySelectorAll('.tab-btn');
+  const panes = document.querySelectorAll('.tab-pane');
+  tabButtons.forEach((btn, i)=>{
+    btn.addEventListener('click', ()=>{
+      tabButtons.forEach(b=>b.classList.remove('active'));
+      panes.forEach(p=>p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('tab'+i).classList.add('active');
+      // redraw canvas on visibility change (ensures correct width)
+      const paneName = btn.textContent.trim();
+      renderBar(paneName, i);
+    });
+  });
+  // Initial render for all tables and the first chart
+  renderTable('BTL Residential', 0);renderTable('BTL Commercial', 1);renderTable('Bridge', 2);renderTable('Fusion', 3);
+  renderBar('BTL Residential', 0);
+  // Wire up filters
+  document.getElementById('filter-0').addEventListener('input', (e)=>renderTable('BTL Residential', 0, e.target.value));document.getElementById('filter-1').addEventListener('input', (e)=>renderTable('BTL Commercial', 1, e.target.value));document.getElementById('filter-2').addEventListener('input', (e)=>renderTable('Bridge', 2, e.target.value));document.getElementById('filter-3').addEventListener('input', (e)=>renderTable('Fusion', 3, e.target.value));
+}
+
+window.addEventListener('load', init);
+</script>
+
+</body></html>
