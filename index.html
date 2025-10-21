@@ -36,16 +36,98 @@
   .dot.y { background:#2ac08b; } .dot.n { background:#e26b6b; }
   .search { display:flex; gap:8px; align-items:center; margin: 8px 0 10px; }
   .search input { background:#0f1733; border:1px solid var(--border); color:var(--text); padding:10px 12px; border-radius:12px; width:320px; outline:none; }
-  /* Table */
-  .table-wrap { overflow:auto; border-radius:16px; border:1px solid var(--border); }
-  table { width:100%; border-collapse: collapse; background: var(--card); }
-  thead th { position:sticky; top:0; background:#0f1630; font-weight:600; font-size:13px; color:#c8d0ef; letter-spacing:.3px; border-bottom:1px solid var(--border); padding:12px 10px; }
-  tbody td { padding:10px 10px; font-size:14px; border-bottom:1px dashed #1c2446; }
-  tbody tr:hover td { background: rgba(255,255,255,.02); }
-  .feature { color:#eaf0ff; white-space:nowrap; }
-  .pill { display:inline-block; min-width:50px; text-align:center; border-radius:999px; padding:6px 10px; font-weight:600; font-size:12px; letter-spacing:.2px; }
-  .yes { background: rgba(30,166,114,.18); color:#bdf3df; border:1px solid rgba(30,166,114,.45);}
-  .no  { background: rgba(217,79,79,.18); color:#ffd3d3; border:1px solid rgba(217,79,79,.45);}
+  /* ---------- IMPROVED TABLE STYLE ---------- */
+.table-wrap {
+  overflow: auto;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed; /* keeps header + body aligned */
+  background: var(--card);
+}
+
+/* Header */
+thead th {
+  position: sticky;
+  top: 0;
+  background: #101739;
+  font-weight: 600;
+  font-size: 13px;
+  color: #c8d0ef;
+  letter-spacing: 0.3px;
+  border-bottom: 1px solid var(--border);
+  padding: 14px 12px;
+  text-align: left;
+}
+
+/* Give more space to the first column */
+thead th:first-child,
+tbody td:first-child {
+  width: 50%;  /* 🟩 Wider for features */
+}
+
+thead th:nth-child(2),
+thead th:nth-child(3),
+thead th:nth-child(4),
+tbody td:nth-child(2),
+tbody td:nth-child(3),
+tbody td:nth-child(4) {
+  width: 16.5%; /* 🟩 Compact for Yes/No columns */
+  text-align: center;
+}
+
+/* Body */
+tbody td {
+  padding: 12px 10px;
+  font-size: 14px;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.06);
+}
+
+tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+  transition: background 0.15s ease;
+}
+
+/* Feature text */
+.feature {
+  color: #eaf0ff;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Pills */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 60px;
+  text-align: center;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: 0.2px;
+}
+
+.yes {
+  background: rgba(46, 204, 113, 0.15);
+  color: #a4f5c7;
+  border: 1px solid rgba(46, 204, 113, 0.35);
+}
+
+.no {
+  background: rgba(255, 77, 77, 0.15);
+  color: #ffbaba;
+  border: 1px solid rgba(255, 77, 77, 0.35);
+}
+
   /* Chart */
   .chart-card { margin-top: 16px; }
   canvas { width:100%; max-width:1080px; height:320px; display:block; }
